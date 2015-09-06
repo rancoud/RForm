@@ -9,10 +9,22 @@ abstract class Field {
     protected $name;
 
     /**
-     * Id for attibute id
+     * Label for attribute label
+     * @var string
+     */
+    protected $label;
+
+    /**
+     * Id for attribute id
      * @var string
      */
     protected $id;
+
+    /**
+     * Vlaue for attribute vlaue
+     * @var string
+     */
+    protected $value;
 
     /**
      * Generic List of attributes
@@ -233,25 +245,25 @@ abstract class Field {
     }
 
     /**
+     * Get Value to show for field
+     * @return String
+     */
+    protected function getValue() {
+        return $this->escapeAttribute($this->value);
+    }
+
+    /**
      * Get configuration
      * @param  [type] $args [description]
      * @return [type]       [description]
      */
     public function prepare($args) {
-
         foreach ($args as $k => $v) {
-            if($k === 'name') {
-                $this->name = $v;
+            if (property_exists($this, $k)) {
+                $this->{$k} = $v;
                 continue;
             }
-            if($k === 'id') {
-                $this->id = $v;
-                continue;
-            }
-            if($k === 'label') {
-                $this->label = $v;
-                continue;
-            }
+
             $this->attributes[$k] = $v;
         }
 
@@ -259,17 +271,25 @@ abstract class Field {
     }
 
     /**
-     * Render to implement for each field
+     * Render the html for field (to implement)
      * @return [type] [description]
      */
     public abstract function render();
 
     /**
-     * Display final render
-     * @return [type] [description]
+     * Display the render
+     * @return void
      */
     public function display() {
         echo $this->html;
+    }
+
+    /**
+     * Show directly the field without calling render and display
+     * @return void
+     */
+    public function show() {
+        $this->render()->$this->display();
     }
 
     /**
@@ -278,7 +298,7 @@ abstract class Field {
      * @param  [type] $arguments [description]
      * @return [type]            [description]
      */
-    public static function __callStatic($name, $arguments){
+    public static function __callStatic($name, $arguments) {
         $query = new InputTextField(); 
         return call_user_func_array([$query, $name], $arguments);
     }

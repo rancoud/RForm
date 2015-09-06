@@ -9,3 +9,6 @@ $args = array('name' => '', 'label' => '');
 $input = new InputTextField();
 $input->prepare($args)->render()->display();
 ```
+
+## TODO
+Add validator and filter in the main class
