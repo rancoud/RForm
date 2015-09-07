@@ -21,10 +21,16 @@ abstract class Field {
     protected $id;
 
     /**
-     * Vlaue for attribute vlaue
+     * Value for attribute vlaue
      * @var string
      */
     protected $value;
+
+    /**
+     * DefaultValue for attribute vlaue
+     * @var string
+     */
+    protected $defaultValue = '';
 
     /**
      * Generic List of attributes
@@ -223,7 +229,7 @@ abstract class Field {
      * @param  String $attr Value
      * @return String       Value secured
      */
-    private function escapeAttribute($attr) {
+    protected function escapeAttribute($attr) {
         $attr = $this->checkInvalidUtf8($attr);
         $attr = $this->specialChars($attr);
 
@@ -270,6 +276,34 @@ abstract class Field {
         return $this;
     }
 
+    public function validateValue($containers, $key = null) {
+        if($key === null) {
+            $key = $this->name;
+        }
+
+        if(!is_array($containers)) {
+            $containers = array($containers);
+        }
+
+        foreach ($containers as $container) {
+            if(is_array($container)) {
+                if (isset($container[$key])) {
+                    return $container[$key];
+                }
+            }
+            else if(is_object($container)) {
+                if (isset($container->$key)) {
+                    return $container->$key;
+                }
+            }
+            else {
+                return $container;
+            }
+        }
+
+        return $this->defaultValue;
+    }
+
     /**
      * Render the html for field (to implement)
      * @return [type] [description]
@@ -293,7 +327,7 @@ abstract class Field {
     }
 
     /**
-     * Facade
+     * Facade / EXPERIMENTAIL
      * @param  [type] $name      [description]
      * @param  [type] $arguments [description]
      * @return [type]            [description]
